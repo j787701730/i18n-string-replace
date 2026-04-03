@@ -2,7 +2,7 @@
   "name": "i18n-string-replace",
   "displayName": "i18n-string-replace",
   "description": "多语言文本替换",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.107.0"
