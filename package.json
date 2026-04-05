@@ -1,8 +1,8 @@
 {
   "name": "i18n-string-replace",
   "displayName": "i18n-string-replace",
-  "description": "多语言文本替换",
-  "version": "0.0.2",
+  "description": "多语言文本替换, 支持多个选中批量替换",
+  "version": "0.0.3",
   "icon": "images/icon.png",
   "engines": {
     "vscode": "^1.107.0"
@@ -22,7 +22,18 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
-    "commands": []
+    "commands": [
+      {
+        "command": "i18n-string-replace.replace",
+        "title": "多语言文本替换 t(selection)",
+        "category": "i18n-string-replace.replace"
+      },
+      {
+        "command": "i18n-string-replace.replace2",
+        "title": "多语言文本替换 {t(selection)}",
+        "category": "i18n-string-replace.replace2"
+      }
+    ]
   },
   "license": "MIT",
   "repository": {
