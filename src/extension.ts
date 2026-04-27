@@ -16,7 +16,9 @@ const batchReplace = (type?: '{') => {
   editor.edit((editBuilder) => {
     selections.forEach((selection) => {
       const selectedText = editor.document.getText(selection);
-      editBuilder.replace(selection, replaceStr(selectedText, type));
+      if (selectedText) {
+        editBuilder.replace(selection, replaceStr(selectedText, type));
+      }
     });
   });
 };
@@ -69,44 +71,52 @@ export function activate(context: vscode.ExtensionContext) {
   //   }
   // });
 
-  const hoverProvider = vscode.languages.registerHoverProvider('*', {
-    provideHover(document: vscode.TextDocument, position: vscode.Position) {
-      // 2. 获取编辑器选中区域
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
-        return undefined; // 无打开的编辑器
-      }
+  const hoverProvider = vscode.languages.registerHoverProvider(
+    ['javascript', 'typescript', 'javascriptreact', 'typescriptreact'],
+    {
+      provideHover(document: vscode.TextDocument, position: vscode.Position) {
+        // 2. 获取编辑器选中区域
+        const editor = vscode.window.activeTextEditor;
+        if (!editor) {
+          return undefined; // 无打开的编辑器
+        }
 
-      const selections = editor.selections;
-      // 判断：是否有选中的文本（不是空选区）
-      if (selections.length == 0) {
-        return undefined;
-      }
+        const selections = editor.selections;
 
-      const isPositionInSelection = selections.findIndex((el) => el.contains(position));
-      // 不在选中范围内 → 不显示提示
-      if (isPositionInSelection == -1) {
-        return;
-      }
+        // 判断：是否有选中的文本（不是空选区）
+        if (selections.length == 0) {
+          return undefined;
+        }
+        // 判断第一个不能为空
+        if (selections[0].isEmpty) {
+          return undefined;
+        }
 
-      // 3. 获取选中的文本内容
-      // const selectedText = document.getText(selection);
+        const isPositionInSelection = selections.findIndex((el) => el.contains(position));
+        // 不在选中范围内 → 不显示提示
+        if (isPositionInSelection == -1) {
+          return;
+        }
 
-      // 4. 构造【Markdown 格式】的提示内容（支持所有 MD 语法）
-      const markdownText = new vscode.MarkdownString('', true);
-      markdownText.isTrusted = true;
-      markdownText.appendMarkdown(`i18n 替换文本 ${selections.length} 个\n\n`);
-      markdownText.appendMarkdown('--- \n\n');
-      markdownText.appendMarkdown(`- [替换成 t(selection)](command:i18n-string-replace.replace)\n\n`);
-      markdownText.appendMarkdown(`- [替换成 {t(selection)}](command:i18n-string-replace.replace2)\n\n`);
+        // 3. 获取选中的文本内容
+        // const selectedText = document.getText(selection);
 
-      // 允许 Markdown 解析（必须开启）
-      markdownText.isTrusted = true;
+        // 4. 构造【Markdown 格式】的提示内容（支持所有 MD 语法）
+        const markdownText = new vscode.MarkdownString('', true);
+        markdownText.isTrusted = true;
+        markdownText.appendMarkdown(`i18n 替换文本 ${selections.length} 个\n\n`);
+        markdownText.appendMarkdown('--- \n\n');
+        markdownText.appendMarkdown(`- [替换成 t(selection)](command:i18n-string-replace.replace)\n\n`);
+        markdownText.appendMarkdown(`- [替换成 {t(selection)}](command:i18n-string-replace.replace2)\n\n`);
 
-      // 5. 返回悬停对象（在选中位置显示）
-      return new vscode.Hover(markdownText);
+        // 允许 Markdown 解析（必须开启）
+        markdownText.isTrusted = true;
+
+        // 5. 返回悬停对象（在选中位置显示）
+        return new vscode.Hover(markdownText);
+      },
     },
-  });
+  );
 
   context.subscriptions.push(disposable, disposable2, hoverProvider);
 }
