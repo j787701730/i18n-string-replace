@@ -81,7 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
           return undefined; // 无打开的编辑器
         }
 
-        const selections = editor.selections;
+        const selections = editor.selections.filter((el) => !el.isEmpty);
 
         // 判断：是否有选中的文本（不是空选区）
         if (selections.length == 0) {
@@ -99,7 +99,8 @@ export function activate(context: vscode.ExtensionContext) {
         }
 
         // 3. 获取选中的文本内容
-        // const selectedText = document.getText(selection);
+        // const selectedText = document.getText(editor.selection);
+        // console.log(selectedText, editor.selection.isEmpty);
 
         // 4. 构造【Markdown 格式】的提示内容（支持所有 MD 语法）
         const markdownText = new vscode.MarkdownString('', true);
